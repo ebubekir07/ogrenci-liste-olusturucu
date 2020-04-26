@@ -8,3 +8,6 @@ v3.0 : ad,soyad,sınıf,numara,şube,tc,telefon,doğum tarihi içerir. Ekleme pe
 şifre ve kullanıcı adı "veritabanı.db" dosyasında saklanır. Şifre ve kullanıcı adı değiştirilebilir ve eklenebilir.
 İki adat yetki seviyesi bulunur. Seviye "1":yönetici seviyesidir öğrenci ekleme,silme yetkisi vardır.
 Seviye "2":normal kullanıcı seviyesidir öğrenci verilerini görebilir silemez,ekleyemez.
+
+NOT: programı nerede çalıştırırsanız veritabanı oraya kurulur.Veritabanını taşırsanız tekrar kurulur.
+programı rar dan çıkartmadan çalıştırırsanız rar ın bulunduğu klasöre veritabanını kurar.
