@@ -322,102 +322,6 @@ def notlarigetir():
     else:
         alantmgos()
 
-    def kisiekleme():
-        ad = str(aden.get()).capitalize()
-        soyad = str(soyaden.get()).capitalize()
-        sinif = int(sinifen.get())
-        no = int(oknoen.get())
-        sube = str(subeen.get()).capitalize()
-        tc = int(tcen.get())
-        tel = int(telen.get())
-        ay = str(dogumay.get())
-        gun = int(dogumgun.get())
-        yil = int(dogumyil.get())
-        bolum = str(alan.get())
-        cursor.execute("select count(*) from ogrenciler WHERE no={}".format(no))
-        kontrol2 = cursor.fetchone()
-
-        if (kontrol2[0] == 1):
-            uyarilabel.config(text="Bu numaraya sahip öğrenci \n listede mevcut.")
-
-        elif(len(str(tc))!=11):
-           print("Geçerli bir tc no girin")
-           uyarilabel.config(text="Geçerli bir tc no girin.")
-
-        elif (len(str(tel)) != 10):
-            print("geçerli tel gir")
-            uyarilabel.config(text="Geçerli bir telefon no girin.")
-
-        else:
-            pencere2.destroy()
-            cursor.execute(
-                "INSERT INTO ogrenciler VALUES('{} ','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')".format(no, ad,
-                                                                                                                soyad,
-                                                                                                                sinif,
-                                                                                                                sube,
-                                                                                                                tc, tel,
-                                                                                                                ay, gun,
-                                                                                                                yil,
-                                                                                                                bolum))
-            cursor.execute(
-                "INSERT INTO dersler VALUES('{} ','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')".format(
-                    no, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""))
-            cursor.execute(
-                "INSERT INTO saatler VALUES('{} ','6','4','4','4','5','2','2','2','4','2','2','2','4','3','2','2','')".format(
-                    no))
-            cursor.execute(
-                "INSERT INTO chek VALUES('{}','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0')".format(
-                    no))
-            con.commit()
-            listele()
-
-    def kisiekleme():
-        ad = str(aden.get()).capitalize()
-        soyad = str(soyaden.get()).capitalize()
-        sinif = int(sinifen.get())
-        no = int(oknoen.get())
-        sube = str(subeen.get()).capitalize()
-        tc = int(tcen.get())
-        tel = int(telen.get())
-        ay = str(dogumay.get())
-        gun = int(dogumgun.get())
-        yil = int(dogumyil.get())
-        bolum = str(alan.get())
-        cursor.execute("select count(*) from ogrenciler WHERE no={}".format(no))
-        kontrol2 = cursor.fetchone()
-
-        if (kontrol2[0] == 1):
-            uyarilabel.config(text="Bu numaraya sahip öğrenci \n listede mevcut.")
-
-        elif (len(str(tc)) != 11):
-            print("Geçerli bir tc no girin")
-            uyarilabel.config(text="Geçerli bir tc no girin.")
-
-        elif (len(str(tel)) != 10):
-            print("geçerli tel gir")
-            uyarilabel.config(text="Geçerli bir telefon no girin.")
-
-        else:
-            pencere2.destroy()
-            cursor.execute(
-                "INSERT INTO ogrenciler VALUES('{} ','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')".format(no, ad,
-                                                                                                                soyad,
-                                                                                                                sinif,
-                                                                                                                sube,
-                                                                                                                tc, tel,
-                                                                                                                ay, gun,
-                                                                         bolum))
-            cursor.execute(
-                "INSERT INTO dersler VALUES('{} ','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')".format(
-                    no, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""))
-            cursor.execute(
-                "INSERT INTO saatler VALUES('{} ','6','4','4','4','5','2','2','2','4','2','2','2','4','3','2','2','')".format(
-                    no))
-            cursor.execute(
-                "INSERT INTO chek VALUES('{}','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0')".format(
-                    no))
-            con.commit()
-            listele()
 def kisiekleme():
     ad=str(aden.get()).capitalize()
     soyad=str(soyaden.get()).capitalize()
@@ -535,7 +439,7 @@ def sifredogru():
     global notnoen,notgoren,aylar,listele,pencere
     sifrepenc.destroy()
     pencere = Tk()
-    pencere.title("Öğrenci Listeleme v4.0")
+    pencere.title("Öğrenci Listeleme v3.0")
     pencere.geometry("920x600+25+25")
 
     uyariyetki=Label(pencere,bg="blue",text=girilenkuladi,width=12)
