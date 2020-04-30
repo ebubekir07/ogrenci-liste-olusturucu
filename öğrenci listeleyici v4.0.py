@@ -535,7 +535,7 @@ def sifredogru():
     global notnoen,notgoren,aylar,listele,pencere
     sifrepenc.destroy()
     pencere = Tk()
-    pencere.title("Öğrenci Listeleme v3.0")
+    pencere.title("Öğrenci Listeleme v4.0")
     pencere.geometry("920x600+25+25")
 
     uyariyetki=Label(pencere,bg="blue",text=girilenkuladi,width=12)
