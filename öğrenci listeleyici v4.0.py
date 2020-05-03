@@ -9,7 +9,44 @@ cursor.execute("CREATE TABLE IF NOT EXISTS dersler(no INT,mat INT,fizik INT,kimy
 cursor.execute("CREATE TABLE IF NOT EXISTS saatler(no INT,smat INT,sfizik INT,skimya INT,sbiyo INT,sedeb INT,starih INT,sfel INT,sdin INT,sing INT,sbeden INT,smuzik INT,salm INT,scog INT,ssecedb INT,stkmt INT,spisk INT,toplam INT)")
 cursor.execute("CREATE TABLE IF NOT EXISTS chek(no INT,cmat INT,cfizik INT,ckimya INT,cbiyo INT,cedeb INT,ctarih INT,cfel INT,cdin INT,cing INT,cbeden INT,cmuzik INT,calm INT,ccog INT,csecedb INT,ctkmt INT,cpisk INT)")
 cursor.execute("CREATE TABLE IF NOT EXISTS kullanicilar(kuladi TEXT,sifre TEXT,yetki INT)")
-
+def yenikullanici():
+    yenisifpenc = Tk()
+    yenisifpenc.title("Kullanıcı Ekle")
+    yenisifpenc.geometry("250x150+520+285")
+    yklab=Label(yenisifpenc,text="Yeni Kullanıcı Adı : ",width=15,anchor="w")
+    yklab.grid(row=0, column=0)
+    yken=Entry(yenisifpenc,width=20)
+    yken.grid(row=0, column=1)
+    yslab=Label(yenisifpenc,text="Yeni Şifre : ",width=15,anchor="w")
+    yslab.grid(row=1, column=0)
+    ysen=Entry(yenisifpenc,width=20)
+    ysen.grid(row=1, column=1)
+    yetkilab=Label(yenisifpenc,text="Yetki : ",width=15,anchor="w")
+    yetkilab.grid(row=3,column=0)
+    yetkisev=Combobox(yenisifpenc,state="readonly",values=["Yönetici","Personel"],width=17)
+    yetkisev.grid(row=3,column=1)
+    yetkisev.current(0)
+    def sifreekle():
+        if(yetkisev.get()=="Yönetici"):
+            yetki=2
+        else:
+            yetki=1
+        cursor.execute("INSERT INTO kullanicilar VALUES('{}','{}','{}')".format(yken.get(),ysen.get(), yetki))
+        ysen.delete(first=0, last=22)
+        yken.delete(first=0, last=22)
+        con.commit()
+        messagebox.showinfo("Bilgi", "Eklendi")
+        if(sinyal==1):
+            yenisifpenc.destroy()
+    def kapat():
+        yenisifpenc.destroy()
+        if(sinyal==0):
+            oturum()
+        
+    sifeklebuton=Button(yenisifpenc,text="Ekle",command=sifreekle,width=10)
+    sifeklebuton.grid(row=4,column=1)
+    sifeklebuton=Button(yenisifpenc,text="Tamam",command=kapat,width=10)
+    sifeklebuton.grid(row=5,column=1)
 def notlarigetir():
     gorno = notgoren.get()
     cursor.execute("select count(no) from ogrenciler WHERE no={}".format(gorno))
@@ -436,10 +473,10 @@ def oturumkapat():
     pencere.destroy()
     oturum()
 def sifredogru():
-    global notnoen,notgoren,aylar,listele,pencere
+    global notnoen,notgoren,aylar,listele,pencere,sinyal
     sifrepenc.destroy()
     pencere = Tk()
-    pencere.title("Öğrenci Listeleme v3.0")
+    pencere.title("Öğrenci Listeleme v4.0")
     pencere.geometry("920x600+25+25")
 
     uyariyetki=Label(pencere,bg="blue",text=girilenkuladi,width=12)
@@ -596,6 +633,9 @@ def sifredogru():
         silbuton.place(relx=0.77,rely=0.09)
         eklebuton = Button(pencere,text="Yeni Öğrenci Ekle",command=pencereekle)
         eklebuton.place(relx=0.72,rely=0.16)
+        sinyal=1
+        kuleklebuton=Button(pencere,text="Kullanıcı Ekle",command=yenikullanici)
+        kuleklebuton.place(relx=0.87,rely=0.86)
     cizgilab2=Label(pencere,text="___________________________________",width=27)
     cizgilab2.place(relx=0.43,rely=0.28)
 
@@ -1312,48 +1352,48 @@ def notgir():
         alantm()
 
 def oturum():
-    global sifrepenc,girilenka,girilensif
-    sifrepenc = Tk()
-    sifrepenc.title("Oturum Açın")
-    sifrepenc.geometry("300x110+520+285")
-    uyariks = Label(sifrepenc, text="", width=30)
-    uyariks.grid(row=3, column=0, columnspan=2)
+    global sifrepenc,girilenka,girilensif,sinyal
     cursor.execute("select count(yetki) from kullanicilar")
     kulsayisi = cursor.fetchone()[0]
     if (kulsayisi == 0):
-        cursor.execute("INSERT INTO kullanicilar VALUES('{}','{}','{}')".format("admin", "admin", 2))
-        con.commit()
-        uyariks.config(text="Şifre : admin")
-    cursor.execute("SELECT kuladi FROM kullanicilar")
-    ka = cursor.fetchall()
-    var = IntVar(sifrepenc)
-    kullanicilab = Label(sifrepenc, text="Kullanıcı Adı : ", width=15)
-    kullanicilab.grid(row=0, column=0)
-    girilenka = Combobox(sifrepenc, values=ka, state="readonly", width=17, textvariable=var)
-    girilenka.grid(row=0, column=1)
-    girilenka.current(0)
+        sinyal=0
+        yenikullanici()
+    else:
+        sifrepenc = Tk()
+        sifrepenc.title("Oturum Açın")
+        sifrepenc.geometry("250x110+520+285")
+        uyariks = Label(sifrepenc, text="", width=30)
+        uyariks.grid(row=3, column=0, columnspan=2)    
+        cursor.execute("SELECT kuladi FROM kullanicilar")
+        ka = cursor.fetchall()
+        var = IntVar(sifrepenc)
+        kullanicilab = Label(sifrepenc, text="Kullanıcı Adı : ", width=15)
+        kullanicilab.grid(row=0, column=0)
+        girilenka = Combobox(sifrepenc, values=ka, state="readonly", width=17, textvariable=var)
+        girilenka.grid(row=0, column=1)
+        girilenka.current(0)
 
-    sifrelab = Label(sifrepenc, text="Şifre : ", width=15)
-    sifrelab.grid(row=1, column=0)
-    girilensif = Entry(sifrepenc, width=20)
-    girilensif.grid(row=1, column=1)
-    def kontrolet():
-        global yetkiseviyesi, girilenkuladi
-        girilenkuladi = girilenka.get()
-        girilensifre = girilensif.get()
+        sifrelab = Label(sifrepenc, text="Şifre : ", width=15)
+        sifrelab.grid(row=1, column=0)
+        girilensif = Entry(sifrepenc, width=20)
+        girilensif.grid(row=1, column=1)
+        def kontrolet():
+            global yetkiseviyesi, girilenkuladi
+            girilenkuladi = girilenka.get()
+            girilensifre = girilensif.get()
 
-        cursor.execute("SELECT sifre FROM kullanicilar WHERE kuladi='{}'".format(girilenkuladi))
-        cekilensifre = cursor.fetchone()
-        gelensifre = cekilensifre[0]
-        if (gelensifre == girilensifre):
-            cursor.execute("SELECT yetki FROM kullanicilar WHERE kuladi='{}'".format(girilenkuladi))
-            yetkiseviyesi = cursor.fetchone()[0]
-            sifredogru()
-        else:
-            uyariks.config(text="Hatalı kullanıcı adı veya şifre")
-    girisbuton = Button(sifrepenc, text="Giriş yap", command=kontrolet)
-    girisbuton.grid(row=2, column=12)
-    sifrepenc.mainloop()
+            cursor.execute("SELECT sifre FROM kullanicilar WHERE kuladi='{}'".format(girilenkuladi))
+            cekilensifre = cursor.fetchone()
+            gelensifre = cekilensifre[0]
+            if (gelensifre == girilensifre):
+                cursor.execute("SELECT yetki FROM kullanicilar WHERE kuladi='{}'".format(girilenkuladi))
+                yetkiseviyesi = cursor.fetchone()[0]
+                sifredogru()
+            else:
+                uyariks.config(text="Hatalı şifre")
+        girisbuton = Button(sifrepenc, text="Giriş yap", command=kontrolet)
+        girisbuton.grid(row=2, column=1)
+        sifrepenc.mainloop()
 oturum()
 
 
