@@ -1,8 +1,12 @@
 from tkinter import *
+import datetime
+from datetime import date
 import sqlite3
 from tkinter.ttk import Combobox
 from tkinter import messagebox
 con = sqlite3.connect("veritabani.db")
+dvm = sqlite3.connect("devamsizliklar.db")
+devam = dvm.cursor()
 cursor = con.cursor()
 cursor.execute("CREATE TABLE IF NOT EXISTS ogrenciler(no INT,ad TEXT,soyad TEXT,sinif INT,sube TEXT,tc INT,tel INT,ay TEXT,gun INT,yil INT,bolum TEXT)")
 cursor.execute("CREATE TABLE IF NOT EXISTS dersler(no INT,mat INT,fizik INT,kimya INT,biyo INT,edeb INT,tarih INT,fel INT,din INT,ing INT,beden INT,muzik INT,alm INT,cog INT,secedb INT,tkmt INT,pisk INT)")
@@ -10,6 +14,7 @@ cursor.execute("CREATE TABLE IF NOT EXISTS saatler(no INT,smat INT,sfizik INT,sk
 cursor.execute("CREATE TABLE IF NOT EXISTS chek(no INT,cmat INT,cfizik INT,ckimya INT,cbiyo INT,cedeb INT,ctarih INT,cfel INT,cdin INT,cing INT,cbeden INT,cmuzik INT,calm INT,ccog INT,csecedb INT,ctkmt INT,cpisk INT)")
 cursor.execute("CREATE TABLE IF NOT EXISTS kullanicilar(kuladi TEXT,sifre TEXT,yetki INT)")
 def yenikullanici():
+    global yenisifpenc
     yenisifpenc = Tk()
     yenisifpenc.title("Kullanıcı Ekle")
     yenisifpenc.geometry("250x150+520+285")
@@ -39,10 +44,10 @@ def yenikullanici():
         if(sinyal==1):
             yenisifpenc.destroy()
     def kapat():
+        print(sinyal)
         yenisifpenc.destroy()
         if(sinyal==0):
             oturum()
-        
     sifeklebuton=Button(yenisifpenc,text="Ekle",command=sifreekle,width=10)
     sifeklebuton.grid(row=4,column=1)
     sifeklebuton=Button(yenisifpenc,text="Tamam",command=kapat,width=10)
@@ -52,314 +57,430 @@ def notlarigetir():
     gorno = notgoren.get()
     cursor.execute("select count(no) from ogrenciler WHERE no={}".format(gorno))
     gornovarmi = cursor.fetchone()[0]
-    if (gornovarmi == 0):
-        messagebox.showinfo("Uyarı", "Bu numaraya ait öğrenci bulunamadı.")
-    cursor.execute("SELECT ad FROM ogrenciler WHERE no={}".format(gorno))
-    getirad = cursor.fetchone()[0]
-    cursor.execute("SELECT bolum FROM ogrenciler WHERE no={}".format(gorno))
-    getiralan = cursor.fetchone()[0]
     notgoren.delete(first=0, last=22)
-    gorpenc = Tk()
-    gorpenc.title("Öğrencinin Not Tablosu : {}".format(getirad))
-    gorpenc.geometry("500x360+450+250")
-    cursor.execute("SELECT * FROM chek WHERE no={}".format(gorno))
-    notchek = cursor.fetchone()
-    matvardeger = notchek[1]
-    fizvardeger = notchek[2]
-    kimvardeger = notchek[3]
-    biyovardeger = notchek[4]
-    edebvardeger = notchek[5]
-    tarvardeger = notchek[6]
-    felvardeger = notchek[7]
-    dinvardeger = notchek[8]
-    ingvardeger = notchek[9]
-    bedvardeger = notchek[10]
-    muzvardeger = notchek[11]
-    almvardeger = notchek[12]
-    cogvardeger = notchek[13]
-    secedbvardeger = notchek[14]
-    tkmtvardeger = notchek[15]
-    pskvardeger = notchek[16]
+    try:
+        cursor.execute("SELECT ad FROM ogrenciler WHERE no={}".format(gorno))
+        getirad = cursor.fetchone()[0]
+        cursor.execute("SELECT bolum FROM ogrenciler WHERE no={}".format(gorno))
+        getiralan = cursor.fetchone()[0]
+        gorpenc = Tk()
+        gorpenc.title("Öğrencinin Not Tablosu : {}".format(getirad))
+        gorpenc.geometry("500x360+450+250")
+        cursor.execute("SELECT * FROM chek WHERE no={}".format(gorno))
+        notchek = cursor.fetchone()
+        matvardeger = notchek[1]
+        
+        fizvardeger = notchek[2]
+        kimvardeger = notchek[3]
+        biyovardeger = notchek[4]
+        edebvardeger = notchek[5]
+        tarvardeger = notchek[6]
+        felvardeger = notchek[7]
+        dinvardeger = notchek[8]
+        ingvardeger = notchek[9]
+        bedvardeger = notchek[10]
+        muzvardeger = notchek[11]
+        almvardeger = notchek[12]
+        cogvardeger = notchek[13]
+        secedbvardeger = notchek[14]
+        tkmtvardeger = notchek[15]
+        pskvardeger = notchek[16]
 
-    cursor.execute("SELECT * FROM saatler WHERE no={}".format(gorno))
-    notsaat = cursor.fetchone()
-    matders = notsaat[1]
-    fizders = notsaat[2]
-    kimders = notsaat[3]
-    biyoders = notsaat[4]
-    edebders = notsaat[5]
-    tarders = notsaat[6]
-    felders = notsaat[7]
-    dinders = notsaat[8]
-    ingders = notsaat[9]
-    bedders = notsaat[10]
-    muzders = notsaat[11]
-    almders = notsaat[12]
-    cogders = notsaat[13]
-    secedbders = notsaat[14]
-    tkmtders = notsaat[15]
-    pskders = notsaat[16]
-    derssaat = notsaat[17]
-    cursor.execute("SELECT * FROM dersler WHERE no={}".format(gorno))
-    dersnotu = cursor.fetchone()
+        cursor.execute("SELECT * FROM saatler WHERE no={}".format(gorno))
+        notsaat = cursor.fetchone()
+        matders = notsaat[1]
+        fizders = notsaat[2]
+        kimders = notsaat[3]
+        biyoders = notsaat[4]
+        edebders = notsaat[5]
+        tarders = notsaat[6]
+        felders = notsaat[7]
+        dinders = notsaat[8]
+        ingders = notsaat[9]
+        bedders = notsaat[10]
+        muzders = notsaat[11]
+        almders = notsaat[12]
+        cogders = notsaat[13]
+        secedbders = notsaat[14]
+        tkmtders = notsaat[15]
+        pskders = notsaat[16]
+        derssaat = notsaat[17]
+        cursor.execute("SELECT * FROM dersler WHERE no={}".format(gorno))
+        dersnotu = cursor.fetchone()
+        
+        sonuc = Label(gorpenc, width=22, anchor="w", text="Ortalama=")
+        sonuc.grid(row=0, column=3)
+        ortdurum = Label(gorpenc, width=15, text="")
+        ortdurum.grid(row=0, column=4)
 
-    sonuc = Label(gorpenc, width=22, anchor="w", text="Ortalama=")
-    sonuc.grid(row=0, column=3)
-    ortdurum = Label(gorpenc, width=15, text="")
-    ortdurum.grid(row=0, column=4)
+        tesk = Label(gorpenc, width=22, anchor="w", text="Teşekkür için gereken puan=")
+        tesk.grid(row=1, column=3)
+        tesgos = Label(gorpenc, width=15, text="")
+        tesgos.grid(row=1, column=4)
 
-    tesk = Label(gorpenc, width=22, anchor="w", text="Teşekkür için gereken puan=")
-    tesk.grid(row=1, column=3)
-    tesgos = Label(gorpenc, width=15, text="")
-    tesgos.grid(row=1, column=4)
+        takd = Label(gorpenc, width=22, anchor="w", text="Takdir için gereken puan=")
+        takd.grid(row=2, column=3)
+        takgos = Label(gorpenc, width=15, text="")
+        takgos.grid(row=2, column=4)
 
-    takd = Label(gorpenc, width=22, anchor="w", text="Takdir için gereken puan=")
-    takd.grid(row=2, column=3)
-    takgos = Label(gorpenc, width=15, text="")
-    takgos.grid(row=2, column=4)
+        belge = Label(gorpenc, width=22, anchor="w", text="Belge=")
+        belge.grid(row=3, column=3)
+        belgedurum = Label(gorpenc, font=("Comic Sans MS", 11, "bold"), width=15, text="")
+        belgedurum.grid(row=3, column=4)
 
-    belge = Label(gorpenc, width=22, anchor="w", text="Belge=")
-    belge.grid(row=3, column=3)
-    belgedurum = Label(gorpenc, font=("Comic Sans MS", 11, "bold"), width=15, text="")
-    belgedurum.grid(row=3, column=4)
+        matlab = Label(gorpenc, anchor="w", text="Matematik=")
+        matlab.grid(row=0, column=0)
 
-    matlab = Label(gorpenc, anchor="w", text="Matematik=")
-    matlab.grid(row=0, column=0)
+        edeblab = Label(gorpenc, width=8, anchor="w", text="Edebiyat=")
+        edeblab.grid(row=4, column=0)
+        tarihlab = Label(gorpenc, width=8, anchor="w", text="Tarih=")
+        tarihlab.grid(row=5, column=0)
+        fellab = Label(gorpenc, width=8, anchor="w", text="Felsefe=")
+        fellab.grid(row=6, column=0)
+        dinlab = Label(gorpenc, width=8, anchor="w", text="Din K.=")
+        dinlab.grid(row=7, column=0)
+        inglab = Label(gorpenc, width=8, anchor="w", text="İngilizce=")
+        inglab.grid(row=8, column=0)
+        bedlab = Label(gorpenc, width=8, anchor="w", text="Beden=")
+        bedlab.grid(row=9, column=0)
+        muzlab = Label(gorpenc, width=8, anchor="w", text="Müz/Gör=")
+        muzlab.grid(row=10, column=0)
+        almlab = Label(gorpenc, width=8, anchor="w", text="Almanca=")
+        almlab.grid(row=11, column=0)
 
-    edeblab = Label(gorpenc, width=8, anchor="w", text="Edebiyat=")
-    edeblab.grid(row=4, column=0)
-    tarihlab = Label(gorpenc, width=8, anchor="w", text="Tarih=")
-    tarihlab.grid(row=5, column=0)
-    fellab = Label(gorpenc, width=8, anchor="w", text="Felsefe=")
-    fellab.grid(row=6, column=0)
-    dinlab = Label(gorpenc, width=8, anchor="w", text="Din K.=")
-    dinlab.grid(row=7, column=0)
-    inglab = Label(gorpenc, width=8, anchor="w", text="İngilizce=")
-    inglab.grid(row=8, column=0)
-    bedlab = Label(gorpenc, width=8, anchor="w", text="Beden=")
-    bedlab.grid(row=9, column=0)
-    muzlab = Label(gorpenc, width=8, anchor="w", text="Müz/Gör=")
-    muzlab.grid(row=10, column=0)
-    almlab = Label(gorpenc, width=8, anchor="w", text="Almanca=")
-    almlab.grid(row=11, column=0)
+        smatlab = Label(gorpenc, width=8, text=dersnotu[1])
+        smatlab.grid(row=0, column=1)
 
-    smatlab = Label(gorpenc, width=8, text=dersnotu[1])
-    smatlab.grid(row=0, column=1)
+        sedeblab = Label(gorpenc, width=8, text=dersnotu[5])
+        sedeblab.grid(row=4, column=1)
+        starihlab = Label(gorpenc, width=8, text=dersnotu[6])
+        starihlab.grid(row=5, column=1)
+        sfellab = Label(gorpenc, width=8, text=dersnotu[7])
+        sfellab.grid(row=6, column=1)
+        sdinlab = Label(gorpenc, width=8, text=dersnotu[8])
+        sdinlab.grid(row=7, column=1)
+        singlab = Label(gorpenc, width=8, text=dersnotu[9])
+        singlab.grid(row=8, column=1)
+        sbedlab = Label(gorpenc, width=8, text=dersnotu[10])
+        sbedlab.grid(row=9, column=1)
+        smuzlab = Label(gorpenc, width=8, text=dersnotu[11])
+        smuzlab.grid(row=10, column=1)
+        salmlab = Label(gorpenc, width=8, text=dersnotu[12])
+        salmlab.grid(row=11, column=1)
+        
+        def alanmfgos():
+            fizlab = Label(gorpenc, width=8, anchor="w", text="Fizik=")
+            fizlab.grid(row=1, column=0)
+            kimlab = Label(gorpenc, width=8, anchor="w", text="Kimya=")
+            kimlab.grid(row=2, column=0)
+            biyolab = Label(gorpenc, width=8, anchor="w", text="Biyoloji=")
+            biyolab.grid(row=3, column=0)
 
-    sedeblab = Label(gorpenc, width=8, text=dersnotu[5])
-    sedeblab.grid(row=4, column=1)
-    starihlab = Label(gorpenc, width=8, text=dersnotu[6])
-    starihlab.grid(row=5, column=1)
-    sfellab = Label(gorpenc, width=8, text=dersnotu[7])
-    sfellab.grid(row=6, column=1)
-    sdinlab = Label(gorpenc, width=8, text=dersnotu[8])
-    sdinlab.grid(row=7, column=1)
-    singlab = Label(gorpenc, width=8, text=dersnotu[9])
-    singlab.grid(row=8, column=1)
-    sbedlab = Label(gorpenc, width=8, text=dersnotu[10])
-    sbedlab.grid(row=9, column=1)
-    smuzlab = Label(gorpenc, width=8, text=dersnotu[11])
-    smuzlab.grid(row=10, column=1)
-    salmlab = Label(gorpenc, width=8, text=dersnotu[12])
-    salmlab.grid(row=11, column=1)
+            sfizlab = Label(gorpenc, width=8, text=dersnotu[2])
+            sfizlab.grid(row=1, column=1)
+            skimlab = Label(gorpenc, width=8, text=dersnotu[3])
+            skimlab.grid(row=2, column=1)
+            sbiyolab = Label(gorpenc, width=8, text=dersnotu[4])
+            sbiyolab.grid(row=3, column=1)
 
-    def alanmfgos():
-        fizlab = Label(gorpenc, width=8, anchor="w", text="Fizik=")
-        fizlab.grid(row=1, column=0)
-        kimlab = Label(gorpenc, width=8, anchor="w", text="Kimya=")
-        kimlab.grid(row=2, column=0)
-        biyolab = Label(gorpenc, width=8, anchor="w", text="Biyoloji=")
-        biyolab.grid(row=3, column=0)
+            matnot = dersnotu[1]
+            kimyanot = dersnotu[3]
+            fiziknot = dersnotu[2]
+            biyonot = dersnotu[4]
+            edebnot = dersnotu[5]
+            tarihnot = dersnotu[6]
+            felnot = dersnotu[7]
+            dinnot = dersnotu[8]
+            ingnot = dersnotu[9]
+            bednot = dersnotu[10]
+            muziknot = dersnotu[11]
+            almnot = dersnotu[12]
 
-        sfizlab = Label(gorpenc, width=8, text=dersnotu[2])
-        sfizlab.grid(row=1, column=1)
-        skimlab = Label(gorpenc, width=8, text=dersnotu[3])
-        skimlab.grid(row=2, column=1)
-        sbiyolab = Label(gorpenc, width=8, text=dersnotu[4])
-        sbiyolab.grid(row=3, column=1)
-
-        matnot = dersnotu[1]
-        kimyanot = dersnotu[3]
-        fiziknot = dersnotu[2]
-        biyonot = dersnotu[4]
-        edebnot = dersnotu[5]
-        tarihnot = dersnotu[6]
-        felnot = dersnotu[7]
-        dinnot = dersnotu[8]
-        ingnot = dersnotu[9]
-        bednot = dersnotu[10]
-        muziknot = dersnotu[11]
-        almnot = dersnotu[12]
-
-        mat = matnot * matders
-        fizik = fiziknot * fizders
-        kimya = kimyanot * kimders
-        biyo = biyonot * biyoders
-        edeb = edebnot * edebders
-        tarih = tarihnot * tarders
-        fel = felnot * felders
-        din = dinnot * dinders
-        ing = ingnot * ingders
-        bed = bednot * bedders
-        muzik = muziknot * muzders
-        alm = almnot * almders
-        ort = (mat + fizik + kimya + biyo + edeb + tarih + fel + din + ing + bed + muzik + alm) / derssaat
-
-        if 70 <= ort < 85:
-            if (0 < matnot < 50) or (0 < fiziknot < 50) or (0 < kimyanot < 50) or (0 < biyonot < 50) or (
-                    0 < edebnot < 50) or (0 < tarihnot < 50) or (0 < felnot < 50) or (0 < dinnot < 50) or (
-                    0 < ingnot < 50) or (0 < bednot < 50) or (0 < muziknot < 50) or (0 < almnot < 50):
-                tak = 85 - ort
-                belgedurum.config(text="Belge yok zayıf var", bg="red")
-                tesgos.config(text="Yeterli")
-                takgos.config(text=round(tak, 2))
-
-            elif (matnot == 0) or (fiziknot == 0) or (kimyanot == 0) or (biyonot == 0) or (edebnot == 0) or (
-                    tarihnot == 0) or (felnot == 0) or (dinnot == 0) or (ingnot == 0) or (bednot == 0) or (
-                    muziknot == 0) or (almnot == 0):
-                tak = 85 - ort
-                tesgos.config(text="Yeterli")
-                takgos.config(text=round(tak, 2))
-                belgedurum.config(text="Teşekkür", bg="orange")
+            mat = matnot * matders
+            fizik = fiziknot * fizders
+            kimya = kimyanot * kimders
+            biyo = biyonot * biyoders
+            edeb = edebnot * edebders
+            tarih = tarihnot * tarders
+            fel = felnot * felders
+            din = dinnot * dinders
+            ing = ingnot * ingders
+            bed = bednot * bedders
+            muzik = muziknot * muzders
+            alm = almnot * almders
+            if(derssaat>0):
+                ort = (mat + fizik + kimya + biyo + edeb + tarih + fel + din + ing + bed + muzik + alm) / derssaat
             else:
-                tak = 85 - ort
-                tesgos.config(text="Yeterli")
-                takgos.config(text=round(tak, 2))
-                belgedurum.config(text="Teşekkür", bg="orange")
-        ##==============================================================================================================##
-        elif 85 <= ort <= 100:
-            if (0 < matnot < 50) or (0 < fiziknot < 50) or (0 < kimyanot < 50) or (0 < biyonot < 50) or (
-                    0 < edebnot < 50) or (0 < tarihnot < 50) or (0 < felnot < 50) or (0 < dinnot < 50) or (
-                    0 < ingnot < 50) or (0 < bednot < 50) or (0 < muziknot < 50) or (0 < almnot < 50):
-                belgedurum.config(text="Belge yok zayıf var", bg="red")
-                tesgos.config(text="Yeterli")
-                takgos.config(text="Yeterli")
-            elif (matnot == 0) or (fiziknot == 0) or (kimyanot == 0) or (biyonot == 0) or (edebnot == 0) or (
-                    tarihnot == 0) or (felnot == 0) or (dinnot == 0) or (ingnot == 0) or (bednot == 0) or (
-                    muziknot == 0) or (almnot == 0):
-                belgedurum.config(text="Takdir", bg="green")
-                tesgos.config(text="Yeterli")
-                takgos.config(text="Yeterli")
+                ort=0
+            if 70 <= ort < 85:
+                if (0 < matnot < 50) or (0 < fiziknot < 50) or (0 < kimyanot < 50) or (0 < biyonot < 50) or (
+                        0 < edebnot < 50) or (0 < tarihnot < 50) or (0 < felnot < 50) or (0 < dinnot < 50) or (
+                        0 < ingnot < 50) or (0 < bednot < 50) or (0 < muziknot < 50) or (0 < almnot < 50):
+                    tak = 85 - ort
+                    belgedurum.config(text="Belge yok zayıf var", bg="red")
+                    tesgos.config(text="Yeterli")
+                    takgos.config(text=round(tak, 2))
+
+                elif (matnot == 0) or (fiziknot == 0) or (kimyanot == 0) or (biyonot == 0) or (edebnot == 0) or (
+                        tarihnot == 0) or (felnot == 0) or (dinnot == 0) or (ingnot == 0) or (bednot == 0) or (
+                        muziknot == 0) or (almnot == 0):
+                    tak = 85 - ort
+                    tesgos.config(text="Yeterli")
+                    takgos.config(text=round(tak, 2))
+                    belgedurum.config(text="Teşekkür", bg="orange")
+                else:
+                    tak = 85 - ort
+                    tesgos.config(text="Yeterli")
+                    takgos.config(text=round(tak, 2))
+                    belgedurum.config(text="Teşekkür", bg="orange")
+                ortdurum.config(text=round(ort, 2))
+            ##==============================================================================================================##
+            elif 85 <= ort <= 100:
+                if (0 < matnot < 50) or (0 < fiziknot < 50) or (0 < kimyanot < 50) or (0 < biyonot < 50) or (
+                        0 < edebnot < 50) or (0 < tarihnot < 50) or (0 < felnot < 50) or (0 < dinnot < 50) or (
+                        0 < ingnot < 50) or (0 < bednot < 50) or (0 < muziknot < 50) or (0 < almnot < 50):
+                    belgedurum.config(text="Belge yok zayıf var", bg="red")
+                    tesgos.config(text="Yeterli")
+                    takgos.config(text="Yeterli")
+                elif (matnot == 0) or (fiziknot == 0) or (kimyanot == 0) or (biyonot == 0) or (edebnot == 0) or (
+                        tarihnot == 0) or (felnot == 0) or (dinnot == 0) or (ingnot == 0) or (bednot == 0) or (
+                        muziknot == 0) or (almnot == 0):
+                    belgedurum.config(text="Takdir", bg="green")
+                    tesgos.config(text="Yeterli")
+                    takgos.config(text="Yeterli")
+                else:
+                    belgedurum.config(text="Takdir", bg="green")
+                    tesgos.config(text="Yeterli")
+                    takgos.config(text="Yeterli")
+                ortdurum.config(text=round(ort, 2))
+            ##===============================================================================================================##
+            elif ort==0:
+                gorpenc.destroy()
+                messagebox.showinfo("Uyarı", "Bu öğrenciye not bilgisi girilmemiş.")
+                
             else:
-                belgedurum.config(text="Takdir", bg="green")
-                tesgos.config(text="Yeterli")
-                takgos.config(text="Yeterli")
-        ##===============================================================================================================##
+                tes = 70 - ort
+                tak = 85 - ort
+                tesgos.config(text=round(tes, 2))
+                takgos.config(text=round(tak, 2))
+                belgedurum.config(text="Belge yok", bg="red")
+                ortdurum.config(text=round(ort, 2))
+
+        def alantmgos():
+
+            coglab = Label(gorpenc, width=8, anchor="w", text="Coğrafya=")
+            coglab.grid(row=1, column=0)
+            secedblab = Label(gorpenc, width=8, anchor="w", text="S. Edebiyat=")
+            secedblab.grid(row=2, column=0)
+            tkmtlab = Label(gorpenc, width=8, anchor="w", text="Tkmt=")
+            tkmtlab.grid(row=3, column=0)
+            psklab = Label(gorpenc, width=8, anchor="w", text="Psikoloji=")
+            psklab.grid(row=12, column=0)
+
+            scoglab = Label(gorpenc, width=8, text=dersnotu[13])
+            scoglab.grid(row=1, column=1)
+            ssecedblab = Label(gorpenc, width=8, text=dersnotu[14])
+            ssecedblab.grid(row=2, column=1)
+            stkmtlab = Label(gorpenc, width=8, text=dersnotu[15])
+            stkmtlab.grid(row=3, column=1)
+            spsklab = Label(gorpenc, width=8, text=dersnotu[16])
+            spsklab.grid(row=12, column=1)
+
+            matnot = dersnotu[1]
+            edebnot = dersnotu[5]
+            tarihnot = dersnotu[6]
+            felnot = dersnotu[7]
+            dinnot = dersnotu[8]
+            ingnot = dersnotu[9]
+            bednot = dersnotu[10]
+            muziknot = dersnotu[11]
+            almnot = dersnotu[12]
+            cognot = dersnotu[13]
+            secedbnot = dersnotu[14]
+            tkmtnot = dersnotu[15]
+            psknot = dersnotu[16]
+
+            mat = matnot * matders
+            cog = cognot * cogders
+            secedb = secedbnot * secedbders
+            tkmt = tkmtnot * tkmtders
+            edeb = edebnot * edebders
+            tarih = tarihnot * tarders
+            fel = felnot * felders
+            din = dinnot * dinders
+            ing = ingnot * ingders
+            bed = bednot * bedders
+            muzik = muziknot * muzders
+            alm = almnot * almders
+            psk = psknot * pskders
+
+            if(derssaat>0):
+                ort = (mat + cog + secedb + tkmt + edeb + tarih + fel + din + ing + bed + muzik + alm + psk) / derssaat
+            else:
+                ort=0
+            if 70 <= ort < 85:
+                if (0 < matnot < 50) or (0 < cognot < 50) or (0 < psknot < 50) or (0 < secedbnot < 50) or (
+                        0 < tkmtnot < 50) or (0 < edebnot < 50) or (0 < tarihnot < 50) or (0 < felnot < 50) or (
+                        0 < dinnot < 50) or (0 < ingnot < 50) or (0 < bednot < 50) or (0 < muziknot < 50) or (
+                        0 < almnot < 50):
+                    tak = 85 - ort
+                    belgedurum.config(text="Belge yok zayıf var", bg="red")
+                    tesgos.config(text="Yeterli")
+                    takgos.config(text=round(tak, 2))
+                elif (matnot == 0) or (cognot == 0) or (psknot == 0) or (secedbnot == 0) or (tkmtnot == 0) or (
+                        edebnot == 0) or (tarihnot == 0) or (felnot == 0) or (dinnot == 0) or (ingnot == 0) or (
+                        bednot == 0) or (muziknot == 0) or (almnot == 0):
+                    tak = 85 - ort
+                    tesgos.config(text="Yeterli")
+                    takgos.config(text=round(tak, 2))
+                    belgedurum.config(text="Teşekkür", bg="orange")
+                else:
+                    tak = 85 - ort
+                    tesgos.config(text="Yeterli")
+                    takgos.config(text=round(tak, 2))
+                    belgedurum.config(text="Teşekkür", bg="orange")
+                ortdurum.config(text=round(ort, 2))
+            ##==============================================================================================================##
+            elif 85 <= ort <= 100:
+                if (0 < matnot < 50) or (0 < cognot < 50) or (0 < psknot < 50) or (0 < secedbnot < 50) or (
+                        0 < tkmtnot < 50) or (0 < edebnot < 50) or (0 < tarihnot < 50) or (0 < felnot < 50) or (
+                        0 < dinnot < 50) or (0 < ingnot < 50) or (0 < bednot < 50) or (0 < muziknot < 50) or (
+                        0 < almnot < 50):
+                    belgedurum.config(text="Belge yok zayıf var", bg="red")
+                    tesgos.config(text="Yeterli")
+                    takgos.config(tjext="Yeterli")
+
+                elif (matnot == 0) or (cognot == 0) or (psknot == 0) or (secedbnot == 0) or (tkmtnot == 0) or (
+                        edebnot == 0) or (tarihnot == 0) or (felnot == 0) or (dinnot == 0) or (ingnot == 0) or (
+                        bednot == 0) or (muziknot == 0) or (almnot == 0):
+                    belgedurum.config(text="Takdir", bg="green")
+                    tesgos.config(text="Yeterli")
+                    takgos.config(text="Yeterli")
+                else:
+                    belgedurum.config(text="Takdir", bg="green")
+                    tesgos.config(text="Yeterli")
+                    takgos.config(text="Yeterli")
+                ortdurum.config(text=round(ort, 2))
+            elif ort==0:
+                gorpenc.destroy()
+                messagebox.showinfo("Uyarı", "Bu öğrenciye not bilgisi girilmemiş.")
+            ##==============================================================================================================##
+            else:
+                tes = 70 - ort
+                tak = 85 - ort
+                tesgos.config(text=round(tes, 2))
+                takgos.config(text=round(tak, 2))
+                belgedurum.config(text="Belge yok", bg="red")
+                ortdurum.config(text=round(ort, 2))
+            ##==============================================================================================================##
+
+        if (getiralan == "MF"):
+            alanmfgos()
         else:
-            tes = 70 - ort
-            tak = 85 - ort
-            tesgos.config(text=round(tes, 2))
-            takgos.config(text=round(tak, 2))
-            belgedurum.config(text="Belge yok", bg="red")
+            alantmgos()
+    except:
+        messagebox.showinfo("Uyarı", "Bu numaraya ait öğrenci bulunamadı.")
+        gorpenc.destroy()
+def devamsizlikislemleri():
+    global gelinmeyen
+    devampenc = Tk()
+    devampenc.title("Devamsızlık İşlemleri")
+    devampenc.geometry("450x220+450+250")
+    devgirlabel=Label(devampenc,text="Okul No : ",width=15,anchor="w")
+    devgirlabel.grid(row=0,column=0)
+    devgiren=Entry(devampenc,width=19)
+    devgiren.grid(row=0,column=1)
+    
 
-        ortdurum.config(text=round(ort, 2))
+    def gunlerilistele():
+        global dgunler
+        devam.execute("select count(*) from '{}'".format(devamno))
+        kacgun = devam.fetchone()[0]
+        devam.execute("select * from '{}'".format(devamno))
+        tarihler=devam.fetchall()
 
-    def alantmgos():
+        sb = Scrollbar(devampenc)  
+        sb.grid(row=0,rowspan=8,column=5, sticky=N+S)  
+        dgunler = Listbox(devampenc,height=11, yscrollcommand = sb.set ) 
+        for line in range(0,kacgun):  
+            dgunler.insert(END,tarihler[line])  
+  
+        dgunler.grid(row=0,rowspan=8,column=4 )  
+        sb.config( command = dgunler.yview ) 
+        def silici():
+            try:
+                sel =dgunler.get(dgunler.curselection())[0]
+                #print(sel)
+                devam.execute("DELETE FROM '{}' WHERE gun1='{}'".format(devamno,sel))
+                dvm.commit()
+                gunlerilistele()
+            except:
+                 messagebox.showinfo("Uyarı", "Bir tarih seçiniz.")
+        silbut=Button(devampenc,text="Sil",command=silici,width=8)
+        silbut.grid(row=0,column=6)
+    def ozelgonder():
+        yil=dvmyilen.get()
+        gun=dvmgunen.get()
+        ay=dvmayen.get()
+        ggun=yil+str("-")+ay+str("-")+gun
+        devam.execute("INSERT INTO '{}' VALUES('{}')".format(devamno,ggun))
+        dvm.commit()
+        gunlerilistele()
+    def dvmgonder():
+        ggun=gelinmeyen.get()
+        devam.execute("INSERT INTO '{}' VALUES('{}')".format(devamno,ggun))
+        dvm.commit()
+        gunlerilistele()
+    def dvminfo():
+        global devamno,gelinmeyen,dvmyilen,dvmgunen,dvmayen
+        devamno = devgiren.get()
+        try:
+            cursor.execute("select ad from ogrenciler where no={}".format(devamno))
+            ogrenciad=cursor.fetchone()[0]
+            devampenc.title("Devamsızlık İşlemleri : {}".format(ogrenciad))
+            devgiren.delete(first=0, last=22)
+            gunlerilistele()
+            bilgilab=Label(devampenc,text="Tarih seç(Bugün):",width=15,anchor="w")
+            bilgilab.grid(row=3,column=0)
+            bugun = datetime.date.today()
+            bugun9e = bugun - datetime.timedelta(days = 8)
+            bugun8e = bugun - datetime.timedelta(days = 8)
+            bugun7e = bugun - datetime.timedelta(days = 7)
+            bugun6e = bugun - datetime.timedelta(days = 6)
+            bugun5e = bugun - datetime.timedelta(days = 5)
+            bugun4e = bugun - datetime.timedelta(days = 4)
+            bugun3e = bugun - datetime.timedelta(days = 3)
+            bugun2e = bugun - datetime.timedelta(days = 2)
+            bugun1e = bugun - datetime.timedelta(days = 1)
+            gunler= [bugun9e,bugun8e,bugun7e,bugun6e,bugun5e,bugun4e,bugun3e,bugun2e,bugun1e,bugun]
+            gelinmeyen = Combobox(devampenc,values=gunler,state="readonly",width=17)
+            gelinmeyen.grid(row=3,column=1)
+            gelinmeyen.current(9)
+            cizgilabel=Label(devampenc,text="_____________________________________")
+            cizgilabel.grid(row=2,column=0,columnspan=2)
+            dvmekle=Button(devampenc,text="Ekle",command=dvmgonder,width=8)
+            dvmekle.grid(row=4,column=0)
 
-        coglab = Label(gorpenc, width=8, anchor="w", text="Coğrafya=")
-        coglab.grid(row=1, column=0)
-        secedblab = Label(gorpenc, width=8, anchor="w", text="S. Edebiyat=")
-        secedblab.grid(row=2, column=0)
-        tkmtlab = Label(gorpenc, width=8, anchor="w", text="Tkmt=")
-        tkmtlab.grid(row=3, column=0)
-        psklab = Label(gorpenc, width=8, anchor="w", text="Psikoloji=")
-        psklab.grid(row=12, column=0)
-
-        scoglab = Label(gorpenc, width=8, text=dersnotu[13])
-        scoglab.grid(row=1, column=1)
-        ssecedblab = Label(gorpenc, width=8, text=dersnotu[14])
-        ssecedblab.grid(row=2, column=1)
-        stkmtlab = Label(gorpenc, width=8, text=dersnotu[15])
-        stkmtlab.grid(row=3, column=1)
-        spsklab = Label(gorpenc, width=8, text=dersnotu[16])
-        spsklab.grid(row=12, column=1)
-
-        matnot = dersnotu[1]
-        edebnot = dersnotu[5]
-        tarihnot = dersnotu[6]
-        felnot = dersnotu[7]
-        dinnot = dersnotu[8]
-        ingnot = dersnotu[9]
-        bednot = dersnotu[10]
-        muziknot = dersnotu[11]
-        almnot = dersnotu[12]
-        cognot = dersnotu[13]
-        secedbnot = dersnotu[14]
-        tkmtnot = dersnotu[15]
-        psknot = dersnotu[16]
-
-        mat = matnot * matders
-        cog = cognot * cogders
-        secedb = secedbnot * secedbders
-        tkmt = tkmtnot * tkmtders
-        edeb = edebnot * edebders
-        tarih = tarihnot * tarders
-        fel = felnot * felders
-        din = dinnot * dinders
-        ing = ingnot * ingders
-        bed = bednot * bedders
-        muzik = muziknot * muzders
-        alm = almnot * almders
-        psk = psknot * pskders
-
-        ort = (mat + cog + secedb + tkmt + edeb + tarih + fel + din + ing + bed + muzik + alm + psk) / derssaat
-
-        if 70 <= ort < 85:
-            if (0 < matnot < 50) or (0 < cognot < 50) or (0 < psknot < 50) or (0 < secedbnot < 50) or (
-                    0 < tkmtnot < 50) or (0 < edebnot < 50) or (0 < tarihnot < 50) or (0 < felnot < 50) or (
-                    0 < dinnot < 50) or (0 < ingnot < 50) or (0 < bednot < 50) or (0 < muziknot < 50) or (
-                    0 < almnot < 50):
-                tak = 85 - ort
-                belgedurum.config(text="Belge yok zayıf var", bg="red")
-                tesgos.config(text="Yeterli")
-                takgos.config(text=round(tak, 2))
-            elif (matnot == 0) or (cognot == 0) or (psknot == 0) or (secedbnot == 0) or (tkmtnot == 0) or (
-                    edebnot == 0) or (tarihnot == 0) or (felnot == 0) or (dinnot == 0) or (ingnot == 0) or (
-                    bednot == 0) or (muziknot == 0) or (almnot == 0):
-                tak = 85 - ort
-                tesgos.config(text="Yeterli")
-                takgos.config(text=round(tak, 2))
-                belgedurum.config(text="Teşekkür", bg="orange")
-            else:
-                tak = 85 - ort
-                tesgos.config(text="Yeterli")
-                takgos.config(text=round(tak, 2))
-                belgedurum.config(text="Teşekkür", bg="orange")
-        ##==============================================================================================================##
-        elif 85 <= ort <= 100:
-            if (0 < matnot < 50) or (0 < cognot < 50) or (0 < psknot < 50) or (0 < secedbnot < 50) or (
-                    0 < tkmtnot < 50) or (0 < edebnot < 50) or (0 < tarihnot < 50) or (0 < felnot < 50) or (
-                    0 < dinnot < 50) or (0 < ingnot < 50) or (0 < bednot < 50) or (0 < muziknot < 50) or (
-                    0 < almnot < 50):
-                belgedurum.config(text="Belge yok zayıf var", bg="red")
-                tesgos.config(text="Yeterli")
-                takgos.config(tjext="Yeterli")
-
-            elif (matnot == 0) or (cognot == 0) or (psknot == 0) or (secedbnot == 0) or (tkmtnot == 0) or (
-                    edebnot == 0) or (tarihnot == 0) or (felnot == 0) or (dinnot == 0) or (ingnot == 0) or (
-                    bednot == 0) or (muziknot == 0) or (almnot == 0):
-                belgedurum.config(text="Takdir", bg="green")
-                tesgos.config(text="Yeterli")
-                takgos.config(text="Yeterli")
-            else:
-                belgedurum.config(text="Takdir", bg="green")
-                tesgos.config(text="Yeterli")
-                takgos.config(text="Yeterli")
-        ##==============================================================================================================##
-        else:
-            tes = 70 - ort
-            tak = 85 - ort
-            tesgos.config(text=round(tes, 2))
-            takgos.config(text=round(tak, 2))
-            belgedurum.config(text="Belge yok", bg="red")
-        ##==============================================================================================================##
-        ortdurum.config(text=round(ort, 2))
-
-    if (getiralan == "MF"):
-        alanmfgos()
-    else:
-        alantmgos()
-
+            cizgilabel2=Label(devampenc,text="_____________________________________")
+            cizgilabel2.grid(row=5,column=0,columnspan=2)
+            labelay = Label(devampenc,text="Tarih Gir :(gg/aa/yy)",width=15,anchor="w")
+            labelay.grid(row=6,column=0)
+            dvmayen = Combobox(devampenc,values=["01","02","03","04","05","06","07","08","09",10,11,12],state="readonly",width=3)
+            dvmayen.grid(row=6,column=1)
+            dvmayen.current(0)
+            dvmgunen=Combobox(devampenc,width=3,values=["01","02","03","04","05","06","07","08","09",10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],state="readonly")
+            dvmgunen.grid(row=6,column=1,sticky="w")
+            dvmgunen.current(0)
+            dvmyilen=Combobox(devampenc,values=[2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030],state="readonly",width=4)
+            dvmyilen.grid(row=6,column=1,sticky="e")
+            dvmyilen.current(0)
+            dvmozel=Button(devampenc,text="Ekle",command=ozelgonder,width=8)
+            dvmozel.grid(row=7,column=0)
+        except:
+            devampenc.destroy()
+            messagebox.showinfo("Uyarı", "Bu numaraya ait öğrenci bulunamadı.")
+    devbuton=Button(devampenc,text="Ok",command=dvminfo,width=8)
+    devbuton.grid(row=1,column=0)   
 def kisiekleme():
     ad=str(aden.get()).capitalize()
     soyad=str(soyaden.get()).capitalize()
@@ -390,9 +511,11 @@ def kisiekleme():
         pencere2.destroy()
         cursor.execute("INSERT INTO ogrenciler VALUES('{} ','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')".format(no,ad,soyad,sinif,sube,tc,tel,ay,gun,yil,bolum))
         cursor.execute("INSERT INTO dersler VALUES('{} ','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')".format(no,"","","","","","","","","","","","","","","",""))
-        cursor.execute("INSERT INTO saatler VALUES('{} ','6','4','4','4','5','2','2','2','4','2','2','2','4','3','2','2','')".format(no))
+        cursor.execute("INSERT INTO saatler VALUES('{} ','6','4','4','4','5','2','2','2','4','2','2','2','4','3','2','2','0')".format(no))
         cursor.execute("INSERT INTO chek VALUES('{}','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0')".format(no))
+        devam.execute("CREATE TABLE IF NOT EXISTS '{}'(gun1 TEXT)".format(no))
         con.commit()
+        dvm.commit()
         listele()
 def pencereekle():
     global aden,soyaden,sinifen,oknoen,subeen,tcen,telen,dogumay,ayen,dogumgun,dogumyil,uyarilabel,pencere2,alan,kisiekleme
@@ -474,10 +597,10 @@ def oturumkapat():
     pencere.destroy()
     oturum()
 def sifredogru():
-    global notnoen,notgoren,aylar,listele,pencere,sinyal
+    global notnoen,notgoren,aylar,listele,pencere,devgiren,sinyal
     sifrepenc.destroy()
     pencere = Tk()
-    pencere.title("Öğrenci Listeleme v4.0")
+    pencere.title("Öğrenci Listeleme v3.0")
     pencere.geometry("920x600+25+25")
 
     uyariyetki=Label(pencere,bg="blue",text=girilenkuladi,width=12)
@@ -537,38 +660,19 @@ def sifredogru():
             cursor.execute("DELETE FROM ogrenciler WHERE no={}".format(silinecek))
             con.commit()
             listele()
-    def verialno():
-        global datano
+    def verial():  
+        global datano,dataad,datasoy,datasinif
         cursor.execute('SELECT no FROM ogrenciler ORDER BY no ASC')
-        con.commit()
         datano = cursor.fetchall()
-        #print(datano)
-    def verialad():
-        global dataad
         cursor.execute('SELECT ad FROM ogrenciler ORDER BY no ASC')
-        con.commit()
         dataad = cursor.fetchall()
-        #print(dataad)
-    def verialsoy():
-        global datasoy
         cursor.execute('SELECT soyad FROM ogrenciler ORDER BY no ASC')
-        con.commit()
         datasoy = cursor.fetchall()
-        #print(datasoy)
-    def verialsinif():
-        global datasinif
         cursor.execute('SELECT sinif FROM ogrenciler ORDER BY no ASC')
-        con.commit()
         datasinif = cursor.fetchall()
-    labelno= ""
-    labelogad=""
-    labelogsoyad=""
-    labelogsınıf=""
+        
     def listele():
-        verialno()
-        verialad()
-        verialsoy()
-        verialsinif()
+        verial()
         mevcutsayi()
         for i in range(mevcut+1):
             satir=1
@@ -577,13 +681,10 @@ def sifredogru():
             degerdata= degerdata + i
             a=str(i)
             labelno= "abc"
-            labelogad ="qwe"
-            labelogsoyad="zxc"
-            labelogsınıf="asd"
             labelno = labelno + a
-            labelogad=labelogad +a
-            labelogsoyad=labelogsoyad + a
-            labelogsınıf=labelogsınıf + a
+            labelogad=labelno +a
+            labelogsoyad=labelno + a
+            labelogsınıf=labelno + a
             labelno = Label(frame,text="",width=10)
             labelno.grid(row=satir,column=0)
             labelogad = Label(frame,text="",width=15)
@@ -599,13 +700,10 @@ def sifredogru():
             degerdata= degerdata + i
             a=str(i)
             labelno= "abc"
-            labelogad ="qwe"
-            labelogsoyad="zxc"
-            labelogsınıf="asd"
             labelno = labelno + a
-            labelogad=labelogad +a
-            labelogsoyad=labelogsoyad + a
-            labelogsınıf=labelogsınıf + a
+            labelogad=labelno +a
+            labelogsoyad=labelno + a
+            labelogsınıf=labelno + a
             labelno = Label(frame,text=datano[degerdata],bg="dark grey",relief="solid",width=10)
             labelno.grid(row=satir,column=0)
             labelogad = Label(frame,text=dataad[degerdata],bg="grey",relief="solid",width=15)
@@ -619,12 +717,10 @@ def sifredogru():
         listele()
     aylar = ['Ocak', 'Şubat', 'Mart', 'Nisan','Mayıs', 'Haziran',"Temmuz","Ağustos",
                "Eylül","Ekim","Kasım","Aralık"]
-    if(yetkiseviyesi==2):
-
+    if(yetkiseviyesi==2):#admin girişi
         cizgilab2=Label(pencere,text="___________________________________",width=27)
         cizgilab2.place(relx=0.65,rely=0.12)
-        bilgilab1=Label(pencere,text="Öğrenci Sil",
-                      font=("Comic Sans MS",11,"bold"),width=15)
+        bilgilab1=Label(pencere,text="Öğrenci Sil",font=("Comic Sans MS",11,"bold"),width=15)
         bilgilab1.place(relx=0.69,rely=0.001)
         silno = Label(pencere,text="Okul No:",width=10,anchor="w")
         silno.place(relx=0.68,rely=0.05)
@@ -637,9 +733,13 @@ def sifredogru():
         sinyal=1
         kuleklebuton=Button(pencere,text="Kullanıcı Ekle",command=yenikullanici)
         kuleklebuton.place(relx=0.87,rely=0.86)
+
     cizgilab2=Label(pencere,text="___________________________________",width=27)
     cizgilab2.place(relx=0.43,rely=0.28)
 
+    cizgilab4=Label(pencere,text="___________________________________",width=27)
+    cizgilab4.place(relx=0.43,rely=0.45)
+    #------------------------------------------------
     bilgilab3=Label(pencere,text="Not Gir",
                       font=("Comic Sans MS",11,"bold"),width=15)
     bilgilab3.place(relx=0.47,rely=0.15)
@@ -649,12 +749,11 @@ def sifredogru():
     notnoen.place(relx=0.54,rely=0.20)
     notgirbuton = Button(pencere,text="Tamam",command=notgir,width=6)
     notgirbuton.place(relx=0.55,rely=0.24)
-
+    #--------------------------------------------------
     cizgilab=Label(pencere,text="___________________________________",width=27)
     cizgilab.place(relx=0.43,rely=0.12)
-
-    bilgilab2=Label(pencere,text="Bilgileri Getir",
-                      font=("Comic Sans MS",11,"bold"),width=15)
+    #-------------------------------------------------
+    bilgilab2=Label(pencere,text="Bilgileri Getir",font=("Comic Sans MS",11,"bold"),width=15)
     bilgilab2.place(relx=0.47,rely=0.001)
     getirno = Label(pencere,text="Okul No:",width=10,anchor="w")
     getirno.place(relx=0.46,rely=0.05)
@@ -662,9 +761,8 @@ def sifredogru():
     getiren.place(relx=0.54,rely=0.05)
     getirbuton = Button(pencere,text="Getir",command=kisigetir,width=6)
     getirbuton.place(relx=0.55,rely=0.09)
-
-    bilgilab4=Label(pencere,text="Notları Gör",
-                      font=("Comic Sans MS",11,"bold"),width=15)
+    #------------------------------------------------------
+    bilgilab4=Label(pencere,text="Notları Gör",font=("Comic Sans MS",11,"bold"),width=15)
     bilgilab4.place(relx=0.47,rely=0.32)
     notgorlab = Label(pencere,text="Okul No:",width=10,anchor="w")
     notgorlab.place(relx=0.46,rely=0.37)
@@ -672,6 +770,10 @@ def sifredogru():
     notgoren.place(relx=0.54,rely=0.37)
     notgorbuton = Button(pencere,text="Tamam",command=notlarigetir,width=6)
     notgorbuton.place(relx=0.55,rely=0.41)
+    #--------------------------------------------------------
+    devgirbuton = Button(pencere,text="Devamsızlık İşlemleri",command=devamsizlikislemleri)
+    devgirbuton.place(relx=0.49,rely=0.49)
+    #-------------------------------------------------------
     oturumkapatbuton=Button(pencere,text="Oturumu Kapat",command=oturumkapat,width=11)
     oturumkapatbuton.place(relx=0.87,rely=0.92)
     pencere.mainloop()
@@ -681,7 +783,6 @@ def notgir():
     notnovarmi=cursor.fetchone()[0]
     if(notnovarmi==0):
         messagebox.showinfo("Uyarı", "Bu numaraya ait öğrenci bulunamadı.")
-
     cursor.execute("SELECT ad FROM ogrenciler WHERE no={}".format(notno))
     datanotad = cursor.fetchone()[0]
     cursor.execute("SELECT bolum FROM ogrenciler WHERE no={}".format(notno))
@@ -726,6 +827,26 @@ def notgir():
     secedbnot = dersnotu[14]
     tkmtnot = dersnotu[15]
     psknot = dersnotu[16]
+
+    cursor.execute("SELECT * FROM saatler WHERE no={}".format(notno))
+    notsaat=cursor.fetchone()
+    matders = notsaat[1]
+    fizders = notsaat[2]
+    kimders = notsaat[3]
+    biyoders = notsaat[4]
+    edebders = notsaat[5]
+    tarders = notsaat[6]
+    felders = notsaat[7]
+    dinders = notsaat[8]
+    ingders = notsaat[9]
+    bedders = notsaat[10]
+    muzders = notsaat[11]
+    almders = notsaat[12]
+    cogders = notsaat[13]
+    secedbders = notsaat[14]
+    tkmtders = notsaat[15]
+    pskders = notsaat[16]
+
     def alanmf():
         global matvardeger, edebvardeger, tarvardeger, felvardeger, dinvardeger, ingvardeger, bedvardeger, muzvardeger, almvardeger
         global matders, edebders, tarders, felders, dinders, ingders, bedders, muzders, almders
@@ -842,7 +963,7 @@ def notgir():
             cursor.execute("UPDATE saatler SET smuzik = {} WHERE no = {}".format(muzders,notno))
             cursor.execute("UPDATE saatler SET salm = {} WHERE no = {}".format(almders,notno))
             cursor.execute("UPDATE saatler SET toplam = {} WHERE no = {}".format(derssaat,notno))
-
+            #--------------------------------------------------------------------------------------
             cursor.execute("UPDATE dersler SET mat = {} WHERE no = {}".format(matnot,notno))
             cursor.execute("UPDATE dersler SET kimya = {} WHERE no = {}".format(kimyanot,notno))
             cursor.execute("UPDATE dersler SET fizik = {} WHERE no = {}".format(fiziknot,notno))
@@ -855,7 +976,7 @@ def notgir():
             cursor.execute("UPDATE dersler SET beden = {} WHERE no = {}".format(bednot,notno))
             cursor.execute("UPDATE dersler SET muzik = {} WHERE no = {}".format(muziknot,notno))
             cursor.execute("UPDATE dersler SET alm = {} WHERE no = {}".format(almnot,notno))
-
+            #---------------------------------------------------------------------------------------
             cursor.execute("UPDATE chek SET cmat = {} WHERE no = {}".format(matvardeger,notno))
             cursor.execute("UPDATE chek SET cfizik = {} WHERE no = {}".format(fizvardeger,notno))
             cursor.execute("UPDATE chek SET ckimya = {} WHERE no = {}".format(kimvardeger,notno))
@@ -870,20 +991,7 @@ def notgir():
             cursor.execute("UPDATE chek SET calm = {} WHERE no = {}".format(almvardeger,notno))
             con.commit()
             notpenc.destroy()
-        cursor.execute("SELECT * FROM saatler WHERE no={}".format(notno))
-        notsaat=cursor.fetchone()
-        matders = notsaat[1]
-        fizders = notsaat[2]
-        kimders = notsaat[3]
-        biyoders = notsaat[4]
-        edebders = notsaat[5]
-        tarders = notsaat[6]
-        felders = notsaat[7]
-        dinders = notsaat[8]
-        ingders = notsaat[9]
-        bedders = notsaat[10]
-        muzders = notsaat[11]
-        almders = notsaat[12]
+
 
         cursor.execute("SELECT * FROM chek WHERE no={}".format(notno))
         notchek = cursor.fetchone()
@@ -1137,22 +1245,6 @@ def notgir():
             con.commit()
             notpenc.destroy()
 
-        cursor.execute("SELECT * FROM saatler WHERE no={}".format(notno))
-        notsaat=cursor.fetchone()
-        matders = notsaat[1]
-        edebders = notsaat[5]
-        tarders = notsaat[6]
-        felders = notsaat[7]
-        dinders = notsaat[8]
-        ingders = notsaat[9]
-        bedders = notsaat[10]
-        muzders = notsaat[11]
-        almders = notsaat[12]
-        cogders = notsaat[13]
-        secedbders = notsaat[14]
-        tkmtders = notsaat[15]
-        pskders = notsaat[16]
-
         cursor.execute("SELECT * FROM chek WHERE no={}".format(notno))
         notchek = cursor.fetchone()
         matvardeger = notchek[1]
@@ -1168,6 +1260,7 @@ def notgir():
         secedbvardeger = notchek[14]
         tkmtvardeger = notchek[15]
         pskvardeger = notchek[16]
+    ##===================================================================
         aynidersler()
         cogvar = IntVar(notpenc,value=cogvardeger)
         cogen = IntVar(notpenc,value=cognot)
@@ -1198,16 +1291,6 @@ def notgir():
         tkmtsv.set(tkmtders)
         tkmtspin=Spinbox(notpenc,from_=1,to=10,width=2,textvariable=tkmtsv)
         tkmtspin.grid(row=3,column=2,sticky="w")
-    ##=================================================
-        edebvar = IntVar(notpenc, value=edebvardeger)
-        edeben = IntVar(notpenc, value=edebnot)
-        edebchk = Checkbutton(notpenc, width=10, text="Edebiyat=", variable=edebvar, anchor="w")
-        edebchk.grid(row=4, column=0)
-        edebnotgir = Entry(notpenc, width="8", textvariable=edeben)
-        edebnotgir.grid(row=4, column=1)
-        edebsv.set(edebders)
-        edebspin = Spinbox(notpenc, from_=1, to=10, width=2, textvariable=edebsv)
-        edebspin.grid(row=4, column=2, sticky="w")
 #   #===================================================
         pskvar = IntVar(notpenc,value=pskvardeger)
         psken = IntVar(notpenc,value=psknot)
@@ -1221,7 +1304,6 @@ def notgir():
      ##================================================================
         giris = Button(notpenc,text="Kaydet",command=girisyapma)
         giris.place(relx=0.37,rely=0.90)
-
         def sectm():
             if(tamvartm.get()==1):
                 matchk.select()
@@ -1267,7 +1349,7 @@ def notgir():
         matsv.set(matders)
         matspin = Spinbox(notpenc, from_=1, to=10, width=2, textvariable=matsv)
         matspin.grid(row=0, column=2, sticky="w")
-
+        ##===================================================================
         edebvar = IntVar(notpenc, value=edebvardeger)
         edeben = IntVar(notpenc, value=edebnot)
         edebchk = Checkbutton(notpenc, width=10, text="Edebiyat=", variable=edebvar, anchor="w")
@@ -1351,7 +1433,6 @@ def notgir():
         alanmf()
     elif(datanotalan=="TM"):
         alantm()
-
 def oturum():
     global sifrepenc,girilenka,girilensif,sinyal
     cursor.execute("select count(yetki) from kullanicilar")
@@ -1367,10 +1448,9 @@ def oturum():
         uyariks.grid(row=3, column=0, columnspan=2)    
         cursor.execute("SELECT kuladi FROM kullanicilar")
         ka = cursor.fetchall()
-        var = IntVar(sifrepenc)
         kullanicilab = Label(sifrepenc, text="Kullanıcı Adı : ", width=15)
         kullanicilab.grid(row=0, column=0)
-        girilenka = Combobox(sifrepenc, values=ka, state="readonly", width=17, textvariable=var)
+        girilenka = Combobox(sifrepenc, values=ka, state="readonly", width=17)
         girilenka.grid(row=0, column=1)
         girilenka.current(0)
 
@@ -1382,7 +1462,6 @@ def oturum():
             global yetkiseviyesi, girilenkuladi
             girilenkuladi = girilenka.get()
             girilensifre = girilensif.get()
-
             cursor.execute("SELECT sifre FROM kullanicilar WHERE kuladi='{}'".format(girilenkuladi))
             cekilensifre = cursor.fetchone()
             gelensifre = cekilensifre[0]
