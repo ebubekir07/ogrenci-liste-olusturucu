@@ -47,6 +47,7 @@ def yenikullanici():
     sifeklebuton.grid(row=4,column=1)
     sifeklebuton=Button(yenisifpenc,text="Tamam",command=kapat,width=10)
     sifeklebuton.grid(row=5,column=1)
+    yenisifpenc.mainloop()
 def notlarigetir():
     gorno = notgoren.get()
     cursor.execute("select count(no) from ogrenciler WHERE no={}".format(gorno))
