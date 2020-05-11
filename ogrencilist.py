@@ -1518,7 +1518,7 @@ def sifredogru():
         sinyal=1
         kuleklebuton=Button(pencere,text="Kullanıcı İşlemleri",command=yenikullanici,width=13)
         kuleklebuton.place(relx=0.87,rely=0.82)
-    drivervar = StringVar(pencere,value="C:\\Users\Ebubekir\Downloads\chromedriver.exe")
+    drivervar = StringVar(pencere,value=__import__("os").environ["USERPROFILE"] + r"\Downloads\chromedriver.exe")
     driveren=Entry(pencere,width=55,textvariable=drivervar)
     driveren.place(relx=0.60,rely=0.94)
 
