@@ -6,3 +6,5 @@ programı zipden çıkartmadan çalıştırırsanız zipin bulunduğu klasöre v
 
 E okuldan veri aktarabilmek için bilgisayarda chrome olması gerekiyor. Ayrıyeten zipin içine koyduğum selenium chromedriver.exe dosyasını indirilenler klasörüne atmanız gerekiyor.Selenium kütüphanesi yüklü değilse kurmanız gerekiyor. Aksi takdirde hata alırsınız.
 
+Hata ve bilgi için: ebubekir07a@gmail.com veya ig : @bekrarkali
+
