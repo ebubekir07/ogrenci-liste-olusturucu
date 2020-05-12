@@ -23,9 +23,9 @@ cursor.execute("CREATE TABLE IF NOT EXISTS saatler(no INT,smat INT,sfizik INT,sk
 cursor.execute("CREATE TABLE IF NOT EXISTS chek(no INT,cmat INT,cfizik INT,ckimya INT,cbiyo INT,cedeb INT,ctarih INT,cfel INT,cdin INT,cing INT,cbeden INT,cmuzik INT,calm INT,ccog INT,csecedb INT,ctkmt INT,cpisk INT)")
 cursor.execute("CREATE TABLE IF NOT EXISTS kullanicilar(kuladi TEXT,sifre TEXT,yetki INT)")
 cursor.execute("CREATE TABLE IF NOT EXISTS epostalar(nick TEXT)")
-
+istem=0
 def eokul():
-    global eokulno,istem
+    global eokulno
     eokulno = eokulen.get()
     cursor.execute("select ay,gun,yil,tc,sube,bolum,il,ilce from ogrenciler where no={}".format(eokulno))
     mailveri=cursor.fetchone()
@@ -39,9 +39,14 @@ def eokul():
     ilce=mailveri[7]
     sube=sinifsube + str(" Şubesi")
     try:
-        driver_path = driveren.get()
-        browser = webdriver.Chrome(executable_path=driver_path)
+        try:
+            driver_path = driveren.get()
+            browser = webdriver.Chrome(executable_path=driver_path)
+            browser.set_window_size(650, 330)
+        except:
+            messagebox.showinfo("Hata","Driver bulunamadı!")
         browser.get("https://eokulyd.meb.gov.tr/")
+        
         time.sleep(2)
 
         vg=browser.find_element_by_class_name("btn-vg")
@@ -53,7 +58,12 @@ def eokul():
         tck.send_keys(tc)
         okulnumarasi.send_keys(eokulno)
         key=1
+        aaa=1
         while (key==1):
+            resim=browser.find_element_by_id("imgvbs")
+            if(aaa==1):
+                resim.click()
+            aaa=0
             kod=browser.find_element_by_id("txtVBSImage")
             kod.send_keys("")
             kodd=kod.get_attribute("value")
@@ -126,8 +136,8 @@ def eokul():
             print("soru2=","şube")
             cevap2=Select(browser.find_element_by_id("ddlS2C1"))
             cevap2.select_by_visible_text(sube)
-
-
+        target = browser.find_element_by_css_selector("#Table5 > tbody > tr:nth-child(8) > td:nth-child(4)")
+        target.location_once_scrolled_into_view
         anahtar=1
         while(anahtar==1):
             resim1 = browser.find_element_by_id("rdRes1").get_attribute("checked")
@@ -135,6 +145,7 @@ def eokul():
             resim3 = browser.find_element_by_id("rdRes3").get_attribute("checked")
             resim4 = browser.find_element_by_id("rdRes4").get_attribute("checked")
             resim5 = browser.find_element_by_id("rdRes5").get_attribute("checked")
+            
             if resim1 is not None:
                 anahtar=0
             if resim2 is not None:
@@ -175,13 +186,15 @@ def eokul():
             tarih=float(atarih.replace(",","."))
             edebiyat=float(aedebiyat.replace(",","."))
             ingilizce=float(aingilizce.replace(",","."))
-            
+
+            cursor.execute("UPDATE chek SET ccog = '0' WHERE no = {}".format(eokulno))
+            cursor.execute("UPDATE chek SET cpisk = '0' WHERE no = {}".format(eokulno))
+            cursor.execute("UPDATE chek SET csecedb = '0' WHERE no = {}".format(eokulno))
+            cursor.execute("UPDATE chek SET ctkmt = '0' WHERE no = {}".format(eokulno))
             if matematik>0:
                 cursor.execute("UPDATE chek SET cmat = '1' WHERE no = {}".format(eokulno))
-                con.commit()
             if biyoloji>0:
                 cursor.execute("UPDATE chek SET cbiyo = '1' WHERE no = {}".format(eokulno))
-                con.commit()
             if fizik>0:
                 cursor.execute("UPDATE chek SET cfizik = '1' WHERE no = {}".format(eokulno))
             if kimya>0:
@@ -203,7 +216,7 @@ def eokul():
             if ingilizce>0:
                 cursor.execute("UPDATE chek SET cing = '1' WHERE no = {}".format(eokulno))
             con.commit()
-            print(beden,din,felsefe,muzik,almanca,biyoloji,fizik,kimya,matematik,tarih,edebiyat,ingilizce)
+
             cursor.execute("UPDATE dersler SET mat = '{}' WHERE no = {}".format(matematik,eokulno))
             cursor.execute("UPDATE dersler SET kimya = '{}' WHERE no = {}".format(kimya,eokulno))
             cursor.execute("UPDATE dersler SET fizik = '{}' WHERE no = {}".format(fizik,eokulno))
@@ -232,21 +245,50 @@ def eokul():
             aedebiyat=browser.find_element_by_css_selector("#Table3 > tbody > tr:nth-child(14) > td.header4").text
             aingilizce=browser.find_element_by_css_selector("#Table3 > tbody > tr:nth-child(15) > td.header4").text
 
-            tkmt=atkmt.replace(",",".")
-            secedebiyat=asecedebiyat.replace(",",".")
-            matematik=amatematik.replace(",",".")
-            cografya=acografya.replace(",",".")
-            beden=abeden.replace(",",".")
-            din=adin.replace(",",".")
-            felsefe=afelsefe.replace(",",".")
-            muzik=amuzik.replace(",",".")
-            almanca=aalmanca.replace(",",".")
-            psikoloji=apsikoloji.replace(",",".")
-            tarih=atarih.replace(",",".")
-            edebiyat=aedebiyat.replace(",",".")
-            ingilizce=aingilizce.replace(",",".")
+            tkmt=float(atkmt.replace(",","."))
+            secedebiyat=float(asecedebiyat.replace(",","."))
+            matematik=float(amatematik.replace(",","."))
+            cografya=float(acografya.replace(",","."))
+            beden=float(abeden.replace(",","."))
+            din=float(adin.replace(",","."))
+            felsefe=float(afelsefe.replace(",","."))
+            muzik=float(amuzik.replace(",","."))
+            almanca=float(aalmanca.replace(",","."))
+            psikoloji=float(apsikoloji.replace(",","."))
+            tarih=float(atarih.replace(",","."))
+            edebiyat=float(aedebiyat.replace(",","."))
+            ingilizce=float(aingilizce.replace(",","."))
+            cursor.execute("UPDATE chek SET cbiyo = '0' WHERE no = {}".format(eokulno))
+            cursor.execute("UPDATE chek SET cfizik = '0' WHERE no = {}".format(eokulno))
+            cursor.execute("UPDATE chek SET ckimya = '0' WHERE no = {}".format(eokulno))
+            if matematik>0:
+                cursor.execute("UPDATE chek SET cmat = '1' WHERE no = {}".format(eokulno))
+            if psikoloji>0:
+                cursor.execute("UPDATE chek SET cpisk = '1' WHERE no = {}".format(eokulno))
+            if secedebiyat>0:
+                cursor.execute("UPDATE chek SET csecedb = '1' WHERE no = {}".format(eokulno))
+            if tkmt>0:
+                cursor.execute("UPDATE chek SET ctkmt = '1' WHERE no = {}".format(eokulno))
+            if beden>0:
+                cursor.execute("UPDATE chek SET cbeden = '1' WHERE no = {}".format(eokulno))
+            if din>0:
+                cursor.execute("UPDATE chek SET cdin = '1' WHERE no = {}".format(eokulno))
+            if felsefe>0:
+                cursor.execute("UPDATE chek SET cfel = '1' WHERE no = {}".format(eokulno))
+            if muzik>0:
+                cursor.execute("UPDATE chek SET cmuzik = '1' WHERE no = {}".format(eokulno))
+            if almanca>0:
+                cursor.execute("UPDATE chek SET calm = '1' WHERE no = {}".format(eokulno))
+            if tarih>0:
+                cursor.execute("UPDATE chek SET ctarih = '1' WHERE no = {}".format(eokulno))
+            if edebiyat>0:
+                cursor.execute("UPDATE chek SET cedeb = '1' WHERE no = {}".format(eokulno))
+            if ingilizce>0:
+                cursor.execute("UPDATE chek SET cing = '1' WHERE no = {}".format(eokulno))
+            if cografya>0:
+                cursor.execute("UPDATE chek SET ccog = '1' WHERE no = {}".format(eokulno))
             
-            print(beden,din,felsefe,muzik,almanca,cografya,matematik,psikoloji,secedebiyat,tkmt,tarih,edebiyat,ingilizce)
+           
             cursor.execute("UPDATE dersler SET pisk = '{}' WHERE no = {}".format(psikoloji,eokulno))
             cursor.execute("UPDATE dersler SET tkmt = '{}' WHERE no = {}".format(tkmt, eokulno))
             cursor.execute("UPDATE dersler SET mat = '{}' WHERE no = {}".format(matematik, eokulno))
@@ -261,16 +303,19 @@ def eokul():
             cursor.execute("UPDATE dersler SET muzik = '{}' WHERE no = {}".format(muzik,eokulno))
             cursor.execute("UPDATE dersler SET alm = '{}' WHERE no = {}".format(almanca,eokulno))
             con.commit()
-        istem=1
-        notno=eokulno
-        notgir()
         browser.quit()
+        istemgonder=1
+        sifredogru()
+        time.sleep(0.1)
+        notgir(istemgonder)
+        print("alma başarılı")
         messagebox.showinfo("Bilgi","Öğrencinin notları içe aktarıldı")
+        notlarigetir(istemgonder)
     except:
         print("hata")
         browser.quit()
-        eokul() 
-    
+        messagebox.showinfo("Dikkat","Bir hata oluştu\n\nHata şu sebeplerden oluşmuş olabilir:\nİnternet bağlantısı olmaması.\nÖğrencinin bilgilerinin yanlış kaydedilmiş olması.\nÖğrencinin E-okul sisteminde bilgilerinin değişmiş olması.\nİnternet bağlantısının çok yavaş olması.\nYanlış resim seçilmesi ya da işleyişe müdahale edilmesi\n\nBu durumları kontrol edin ve tekrar deneyin.")
+
 def rapor(mailno,email,mailad,mailsoyad,getiralan):
     global body,message,ort
     
@@ -783,10 +828,13 @@ def yenikullanici():
     sifeklebuton=Button(yenisifpenc,text="Tamam",command=kapat,width=10)
     sifeklebuton.grid(row=5,column=1)
     yenisifpenc.mainloop()
-def notlarigetir():
+def notlarigetir(istem):
     global gorpenc
-    gorno = notgoren.get()
-    notgoren.delete(first=0, last=22)
+    if (istem==2):
+        gorno = notgoren.get()
+        notgoren.delete(first=0, last=22)
+    elif(istem==1):
+        gorno=eokulno
     try:
         cursor.execute("SELECT ad FROM ogrenciler WHERE no={}".format(gorno))
         getirad = cursor.fetchone()[0]
@@ -1210,7 +1258,7 @@ def devamsizlikislemleri():
             messagebox.showinfo("Uyarı", "Bu numaraya ait öğrenci bulunamadı.")
     devbuton=Button(devampenc,text="Ok",command=dvminfo,width=8)
     devbuton.grid(row=1,column=0)   
-def kisiekleme():
+def kisiekleme(gelenkomut):
     ad=str(aden.get()).capitalize()
     soyad=str(soyaden.get()).capitalize()
     sinif=int(sinifen.get())
@@ -1227,7 +1275,9 @@ def kisiekleme():
     ilce=str(ilceen.get()).replace("i","İ").upper()
     cursor.execute("select count(*) from ogrenciler WHERE no={}".format(no))
     kontrol2 = cursor.fetchone()
-    if (kontrol2[0] == 1):
+    guncelno=guncen.get()
+    guncen.delete(first=0,last=22)
+    if (kontrol2[0] == 1) and (gelenkomut==1):
         uyarilabel.config(text="Bu numaraya sahip öğrenci \n listede mevcut.")
 
     elif (len(str(tc)) != 11):
@@ -1240,16 +1290,55 @@ def kisiekleme():
 
     else:
         pencere2.destroy()
-        cursor.execute("INSERT INTO ogrenciler VALUES('{} ','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')".format(no,ad,soyad,sinif,sube,tc,tel,email,ay,gun,yil,bolum,il,ilce))
-        cursor.execute("INSERT INTO dersler VALUES('{} ','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0')".format(no))
-        cursor.execute("INSERT INTO saatler VALUES('{} ','6','4','4','4','5','2','2','2','4','2','2','2','4','3','2','2','0')".format(no))
-        cursor.execute("INSERT INTO chek VALUES('{}','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0')".format(no))
-        devam.execute("CREATE TABLE IF NOT EXISTS '{}'(gun1 TEXT)".format(no))
+        if gelenkomut==1:
+            cursor.execute("INSERT INTO ogrenciler VALUES('{} ','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')".format(no,ad,soyad,sinif,sube,tc,tel,email,ay,gun,yil,bolum,il,ilce))
+            cursor.execute("INSERT INTO dersler VALUES('{} ','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0')".format(no))
+            cursor.execute("INSERT INTO saatler VALUES('{} ','6','4','4','4','5','2','2','2','4','2','2','2','4','3','2','2','0')".format(no))
+            cursor.execute("INSERT INTO chek VALUES('{}','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0')".format(no))
+            devam.execute("CREATE TABLE IF NOT EXISTS '{}'(gun1 TEXT)".format(no))
+            
+        if gelenkomut==2:
+            cursor.execute("DELETE FROM ogrenciler WHERE no={}".format(guncelno))
+            cursor.execute("INSERT INTO ogrenciler VALUES('{} ','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')".format(guncelno,ad,soyad,sinif,sube,tc,tel,email,ay,gun,yil,bolum,il,ilce))
         con.commit()
         dvm.commit()
-        listele()
-def pencereekle():
+        listele() 
+def pencereekle(komut):
     global aden,soyaden,sinifen,oknoen,subeen,tcen,telen,dogumay,ayen,dogumgun,dogumyil,uyarilabel,pencere2,alan,kisiekleme,emailen,ilen,ilceen
+    if komut==2:
+        guncelno=guncen.get()
+        cursor.execute("select * from ogrenciler where no={}".format(guncelno))
+        eski=cursor.fetchone()
+        ad=eski[1]
+        soyad=eski[2]
+        sinif=eski[3]
+        sube=eski[4]
+        tc=eski[5]
+        tel=eski[6]
+        mail=eski[7]
+        ay=eski[8]
+        gun=eski[9]
+        yil=eski[10]
+        bolum=eski[11]
+        il=eski[12]
+        ilce=eski[13]
+        durum=DISABLED
+    else:
+        ad=""
+        soyad=""
+        sinif=""
+        sube=""
+        tc=""
+        tel=""
+        mail=""
+        ay="OCAK"
+        gun=""
+        yil="2002"
+        bolum=""
+        il=""
+        ilce=""
+        guncelno=""
+        durum="normal"
     pencere2 = Tk()
     pencere2.title("Yeni Öğrenci")
     pencere2.geometry("250x360+450+250")
@@ -1257,88 +1346,100 @@ def pencereekle():
     gunen = IntVar(pencere2)
     ayen = StringVar(pencere2)
     alan = StringVar(pencere2)
+    adenvar= StringVar(pencere2,value=ad)
+    soyadenvar= StringVar(pencere2,value=soyad)
+    sinifenvar= StringVar(pencere2,value=sinif)
+    oknoenvar= StringVar(pencere2,value=guncelno)
+    subeenvar= StringVar(pencere2,value=sube)
+    tcenvar= StringVar(pencere2,value=tc)
+    telenvar= StringVar(pencere2,value=tel)
+    emailenvar= StringVar(pencere2,value=mail)
+    ilenvar= StringVar(pencere2,value=il)
+    ilceenvar= StringVar(pencere2,value=ilce)
 
-    eklelabad = Label(pencere2,text="Ad:",width=7,anchor="w")
+    eklelabad = Label(pencere2,text="Ad*:",width=7,anchor="w")
     eklelabad.grid(row=1,column=0)
-    aden = Entry(pencere2,width=20)
+    aden = Entry(pencere2,width=20,textvariable=adenvar)
     aden.grid(row=1,column=1)
 
-    eklelabsoyad = Label(pencere2,text="Soyad:",width=7,anchor="w")
+    eklelabsoyad = Label(pencere2,text="Soyad*:",width=7,anchor="w")
     eklelabsoyad.grid(row=2,column=0)
-    soyaden = Entry(pencere2,width=20)
+    soyaden = Entry(pencere2,width=20,textvariable=soyadenvar)
     soyaden.grid(row=2,column=1)
 
-    eklelabsinif = Label(pencere2,text="Sınıf:",width=7,anchor="w")
+    eklelabsinif = Label(pencere2,text="Sınıf*:",width=7,anchor="w")
     eklelabsinif.grid(row=3,column=0)
-    sinifen = Entry(pencere2,width=20)
+    sinifen = Entry(pencere2,width=20,textvariable=sinifenvar)
     sinifen.grid(row=3,column=1)
 
-    eklelabokno = Label(pencere2,text="Okul No:",width=7,anchor="w")
+    eklelabokno = Label(pencere2,text="Okul No*:",width=7,anchor="w")
     eklelabokno.grid(row=4,column=0)
-    oknoen = Entry(pencere2,width=20)
+    oknoen = Entry(pencere2,width=20,textvariable=oknoenvar,state=durum)
     oknoen.grid(row=4,column=1)
 
-    eklesube = Label(pencere2,text="Şube:",width=7,anchor="w")
+    eklesube = Label(pencere2,text="Şube*:",width=7,anchor="w")
     eklesube.grid(row=5,column=0)
-    subeen = Entry(pencere2,width=20)
+    subeen = Entry(pencere2,width=20,textvariable=subeenvar)
     subeen.grid(row=5,column=1)
 
-    ekletc = Label(pencere2,text="Tc. No:",width=7,anchor="w")
+    ekletc = Label(pencere2,text="Tc. No*:",width=7,anchor="w")
     ekletc.grid(row=6,column=0)
-    tcen = Entry(pencere2,width=20)
+    tcen = Entry(pencere2,width=20,textvariable=tcenvar)
     tcen.grid(row=6,column=1)
 
 
     ekletel = Label(pencere2,text="Telefon:",width=7,anchor="w")
     ekletel.grid(row=7,column=0)
-    telen = Entry(pencere2,width=20)
+    telen = Entry(pencere2,width=20,textvariable=telenvar)
     telen.grid(row=7,column=1)
 
     bolumler= ["MF","TM"]
-    labelalan = Label(pencere2,text="Alan:",width=7,anchor="w")
+    labelalan = Label(pencere2,text="Alan*:",width=7,anchor="w")
     labelalan.grid(row=8,column=0)
     alanen = Combobox(pencere2,values=bolumler,state="readonly",width=17 ,textvariable=alan)
     alanen.grid(row=8,column=1)
-    alanen.current(0)
+    alanen.set(bolum)
 
-    labelay = Label(pencere2,text="D. Ayı:",width=7,anchor="w")
+    labelay = Label(pencere2,text="D. Ayı*:",width=7,anchor="w")
     labelay.grid(row=9,column=0)
     dogumay = Combobox(pencere2,values=aylar,state="readonly",width=17 ,textvariable=ayen)
     dogumay.grid(row=9,column=1)
-    dogumay.current(0)
+    dogumay.set(ay)
 
-    gunen.set(1)
-    labelgun = Label(pencere2,text="D. Günü:",width=7,anchor="w")
+    gunen.set(gun)
+    labelgun = Label(pencere2,text="D. Günü*:",width=7,anchor="w")
     labelgun.grid(row=10,column=0)
     dogumgun=Spinbox(pencere2,from_=1,to=31,width=18,textvariable=gunen)
     dogumgun.grid(row=10,column=1)
 
-    yilen.set(2002)
-    labelyil = Label(pencere2,text="D. Yılı:",width=7,anchor="w")
+    yilen.set(yil)
+    labelyil = Label(pencere2,text="D. Yılı*:",width=7,anchor="w")
     labelyil.grid(row=11,column=0)
     dogumyil=Spinbox(pencere2,from_=1950,to=2030,width=18,textvariable=yilen)
     dogumyil.grid(row=11,column=1)
 
-    ekleil = Label(pencere2,text="Doğum İl :",width=7,anchor="w")
+    ekleil = Label(pencere2,text="Doğum İl* :",width=7,anchor="w")
     ekleil.grid(row=12,column=0)
-    ilen = Entry(pencere2,width=20)
+    ilen = Entry(pencere2,width=20,textvariable=ilenvar)
     ilen.grid(row=12,column=1)
 
 
-    ekleilce = Label(pencere2,text="Doğum İlçe :",width=7,anchor="w")
+    ekleilce = Label(pencere2,text="Doğum İlçe* :",width=7,anchor="w")
     ekleilce.grid(row=13,column=0)
-    ilceen = Entry(pencere2,width=20)
+    ilceen = Entry(pencere2,width=20,textvariable=ilceenvar)
     ilceen.grid(row=13,column=1)
 
     eklemail = Label(pencere2,text="Mail:",width=7,anchor="w")
     eklemail.grid(row=14,column=0)
-    emailen = Entry(pencere2,width=20)
+    emailen = Entry(pencere2,width=20,textvariable=emailenvar)
     emailen.grid(row=14,column=1)
 
     uyarilabel=Label(pencere2,text="",width=30)
     uyarilabel.grid(row=16,column=0,columnspan=2)
-
-    eklebuton = Button(pencere2,text="Ekle",command=kisiekleme)
+    uyarilabel.config(text="*Zorunlu")
+    def aa():
+        kisiekleme(komut)
+    eklebuton = Button(pencere2,text="Kaydet",command=aa)
     eklebuton.grid(row=15,column=1)
 def oturumkapat():
     try:
@@ -1368,8 +1469,11 @@ def oturumkapat():
     pencere.destroy()
     oturum()
 def sifredogru():
-    global notnoen,notgoren,aylar,listele,pencere,devgiren,sinyal,mailnoen,komut,eokulen,istem,driveren
-    sifrepenc.destroy()
+    global notnoen,notgoren,aylar,listele,pencere,devgiren,sinyal,mailnoen,eokulen,driveren,guncen
+    try:
+        sifrepenc.destroy()
+    except:
+        print("pencere şifre ile açılmadı")
     pencere = Tk()
     pencere.title("Öğrenci Listeleyici v6.0")
     pencere.geometry("920x600+25+25")
@@ -1510,9 +1614,25 @@ def sifredogru():
                 print("Öğrenci silinmedi.")
         silbuton = Button(pencere,text="Sil",command=kisisilinsinmi,width=6)
         silbuton.place(relx=0.77,rely=0.09)
-        eklebuton = Button(pencere,text="Yeni Öğrenci Ekle",command=pencereekle)
-        eklebuton.place(relx=0.72,rely=0.16)
-        komut=0
+        guncen=Entry(pencere,width=8)
+        guncen.place(relx=0.84,rely=0.165)
+        def guncellevarmi():
+            guncelno=guncen.get()
+            if guncelno!="":
+                cursor.execute("select count() from ogrenciler where no={}".format(guncelno))
+                guncelnovarmi = cursor.fetchone()[0]
+                if guncelnovarmi==1:
+                    komutgonder=2
+                    pencereekle(komutgonder)
+                else:
+                    komutgonder=1
+                    guncen.delete(first=0,last=22)
+                    pencereekle(komutgonder)
+            else:
+                komutgonder=1
+                pencereekle(komutgonder)
+        eklebuton = Button(pencere,text="Öğrenci Ekle-Güncelle",command=guncellevarmi)
+        eklebuton.place(relx=0.69,rely=0.16)
         mailbuton = Button(pencere,text="Mail işlemleri",command=mailoturumac)
         mailbuton.place(relx=0.735,rely=0.24)
         sinyal=1
@@ -1528,15 +1648,16 @@ def sifredogru():
     cizgilab4=Label(pencere,text="___________________________________",width=27)
     cizgilab4.place(relx=0.43,rely=0.45)
     #------------------------------------------------
-    bilgilab3=Label(pencere,text="Not Gir",
-                      font=("Comic Sans MS",11,"bold"),width=15)
+    bilgilab3=Label(pencere,text="Not Gir",font=("Comic Sans MS",11,"bold"),width=15)
     bilgilab3.place(relx=0.47,rely=0.15)
     notlab = Label(pencere,text="Okul No:",width=10,anchor="w")
     notlab.place(relx=0.46,rely=0.20)
     notnoen = Entry(pencere,width=10)
     notnoen.place(relx=0.54,rely=0.20)
-    istem=0
-    notgirbuton = Button(pencere,text="Tamam",command=notgir,width=6)
+    def istemle():
+        istemgonder=2
+        notgir(istemgonder)
+    notgirbuton = Button(pencere,text="Tamam",command=istemle,width=6)
     notgirbuton.place(relx=0.55,rely=0.24)
     #--------------------------------------------------
     cizgilab=Label(pencere,text="___________________________________",width=27)
@@ -1560,8 +1681,10 @@ def sifredogru():
     notgorlab.place(relx=0.46,rely=0.37)
     notgoren = Entry(pencere,width=10)
     notgoren.place(relx=0.54,rely=0.37)
-    komut=0
-    notgorbuton = Button(pencere,text="Tamam",command=notlarigetir,width=6)
+    def istemlegor():
+        istemgonder=2
+        notlarigetir(istemgonder)
+    notgorbuton = Button(pencere,text="Tamam",command=istemlegor,width=6)
     notgorbuton.place(relx=0.55,rely=0.41)
     #------------------------------------------------------
     eokulbilgilab=Label(pencere,text="E Okul Veri Al",font=("Comic Sans MS",11,"bold"),width=15).place(relx=0.47,rely=0.57)
@@ -1583,13 +1706,15 @@ def sifredogru():
     oturumkapatbuton=Button(pencere,text="Oturumu Kapat",command=oturumkapatilsinmi,width=13)
     oturumkapatbuton.place(relx=0.87,rely=0.88)
     pencere.mainloop()
-def notgir():
-    global notpenc
-    if istem==0:
+def notgir(istem):
+    global notpec
+    if (istem == 2):
         notno=notnoen.get()
-    else:
+    elif(istem==1):
         eokulen.delete(first=0,last=22)
         notno=eokulno
+    else:
+        print("istem yok")
     cursor.execute("select count(no) from ogrenciler WHERE no={}".format(notno))
     notnovarmi=cursor.fetchone()[0]
     if(notnovarmi==0):
